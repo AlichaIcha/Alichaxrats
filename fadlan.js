@@ -138,7 +138,7 @@ const getMessage = async key => {
 }
 
 global.conn = simple.makeWASocket(connectionOptions)
-conn.isInit = false
+client.isInit = false
 
 if (!opts['test']) {
 	if (global.db) setInterval(async () => {
@@ -150,17 +150,17 @@ if (!opts['test']) {
 async function connectionUpdate(update) {
 	const { connection, lastDisconnect } = update
 	global.timestamp.connect = new Date
-	if (lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut && conn.ws.readyState !== WebSocket.CONNECTING) {
+	if (lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut && consolws.readyState !== WebSocket.CONNECTING) {
 		console.log(global.reloadHandler(true))
 	}
 	if (global.db.data == null) await loadDatabase()
 	// console.log(JSON.stringify(update, null, 4))
 }
-	 if((usePairingCode || useMobile) && fs.existsSync('./konek/creds.json') && !conn.authState.creds.registered) {
+	 if((usePairingCode || useMobile) && fs.existsSync('./konek/creds.json') && !client.authState.creds.registered) {
 		client.log(chalk.yellow('-- WARNING: creds.json is broken, please delete it first --'))
 		process.exit(0)
 	}
-	 if(isPairing && !conn.authState.creds.registered) {
+	 if(isPairing && !client.authState.creds.registered) {
 			if(useMobile) throw new Error('Tidak dapat menggunakan Pairing Baileys API!')
 			const { registration } = { registration: {} }
 			let phoneNumber = ''
@@ -171,7 +171,7 @@ async function connectionUpdate(update) {
 			phoneNumber = phoneNumber.replace(/\D/g,'')
 			client.log(chalk.bgWhite(chalk.blue('Tunggu Sebentar...')))
 			setTimeout(async () => {
-					let code = await conn.requestPairingCode(phoneNumber)
+					let code = await client.requestPairingCode(phoneNumber)
 					code = code?.match(/.{1,4}/g)?.join('-') || code
 					client.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
 			}, 3000)
