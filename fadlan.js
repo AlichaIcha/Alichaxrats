@@ -1,4 +1,4 @@
-const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js")
+const { Client, makeWASocket, LocalAuth, MessageMedia } = require("whatsapp-web.js")
 const qrcode = require('qrcode-terminal');
 const admin = require('firebase-admin');
 const fs = require('fs');
@@ -93,17 +93,17 @@ function deleteInvalidData() {
 // Inisialisasi WhatsApp Client
 async function connectToWhatsApp() {
 const { state, saveCreds } = await useMultiFileAuthState(`session/${global.sessionName}`)
-const Senchini = makeWASocket({
+const client = makeWASocket({
 logger: pino({ level: "silent" }),
 printQRInTerminal: !usePairingCode,
 auth: state,
 browser: ["Ubuntu", "Chrome", "20.0.04"],
 });
-if(usePairingCode && !Senchini.authState.creds.registered) {
+if(usePairingCode && !client.authState.creds.registered) {
         await clearConsole();
 		client.log(`The process of connecting to ${bottz}`)
 		setTimeout(async () => {
-          code = await Senchini.requestPairingCode(bottz)
+          code = await client.requestPairingCode(bottz)
           code = code?.match(/.{1,4}/g)?.join("-") || code
           client.log(`Pairing code: ${code.toUpperCase()}`);
         }, 3000)
